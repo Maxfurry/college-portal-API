@@ -92,9 +92,24 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $catId)
     {
-        //
+        if ($catId == 1) {
+            $res = (object) array (
+                'status' => 403,
+                'message' => "This category cannot be updated"
+            ); 
+            return response()->json($res);
+        }
+            
+        $category = new Category();
+        $category = $category->updateCategory($request, $catId);
+
+        $res = (object) array (
+            'status' => 201,
+            'message' => "Category $category[0] Updated to $category[1] Succesfully"
+        );
+        return response()->json($res);
     }
 
     /**
@@ -103,8 +118,23 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy($catId)
     {
-        //
+        if ($catId == 1) {
+            $res = (object) array (
+                'status' => 403,
+                'message' => "This category cannot be deleted"
+            ); 
+            return response()->json($res);
+        }
+
+        $category = new Category();
+        $category = $category->deleteCategory($catId);
+
+        $res = (object) array (
+            'status' => 201,
+            'message' => "Category $category->category Deleted Succesfully"
+        );
+        return response()->json($res);
     }
 }

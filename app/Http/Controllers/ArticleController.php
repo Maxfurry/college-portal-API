@@ -73,7 +73,7 @@ class ArticleController extends Controller
             \DB::rollback();
 
             $res = (object) array (
-                'status' => 200,
+                'status' => 500,
                 'message' => "Article $newArticle->title not created successfully",
                 'success' => false
             );

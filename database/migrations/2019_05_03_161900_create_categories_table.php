@@ -18,6 +18,14 @@ class CreateCategoriesTable extends Migration
             $table->string('category');
             $table->timestamps();
         });
+
+        DB::table('categories')->insert(
+            [
+                'category' => 'uncategorized',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]
+        );
     }
 
     /**
