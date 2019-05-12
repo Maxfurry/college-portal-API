@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\Tag;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
@@ -44,15 +45,39 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        $newArticle = new Article();
-        $newArticle = $newArticle->createArticle($request);
-        
-        $res = (object) array (
-            'status' => 200,
-            'message' => "Article $newArticle->title created successfully",
-            'success' => true,
-            'data' => $newArticle
-        );
+        \DB::beginTransaction(); 
+        try {
+            $newArticle = new Article();
+            $newArticle = $newArticle->createArticle($request);
+
+            $tag = new Tag();
+            $tags = $request->tag;
+            $tagIdArray = array();
+
+            foreach($tags as $tagName) {
+                $tag = $tag->findOrCreateTag($tagName);
+                array_push($tagIdArray, $tag->id); 
+            }
+            $newArticle->tags()->attach($tagIdArray);
+
+            \DB::commit();
+
+            $res = (object) array (
+                'status' => 200,
+                'message' => "Article $newArticle->title created successfully",
+                'success' => true,
+                'data' => $newArticle
+            );
+        } catch (\Exception $e) {
+
+            \DB::rollback();
+
+            $res = (object) array (
+                'status' => 200,
+                'message' => "Article $newArticle->title not created successfully",
+                'success' => false
+            );
+        }
         return response()->json($res);
     }
 

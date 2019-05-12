@@ -11,25 +11,25 @@ class Article extends Model
     protected $hidden = ['category_id'];
 
     public function createArticle($request) {
-        // $articleName = new Article();
-        // $articleName->title = $request->input('title');
-        // $articleName->description = $request->input('description');
-        // $articleName->content  = $request->input('content');
-        // $articleName->category_id  = $request->input('category_id');
-        // $articleName->status  = $request->input('status');
-        // $articleName->save();
+        // $newArticle = new Article();
+        // $newArticle->title = $request->input('title');
+        // $newArticle->description = $request->input('description');
+        // $newArticle->content  = $request->input('content');
+        // $newArticle->category_id  = $request->input('category_id');
+        // $newArticle->status  = $request->input('status');
+        // $newArticle->save();
 
-        // return $articleName;
+        // return $newArticle;
 
-        return Article::create($request->all());
+        return $this::create($request->all());
     } 
 
     public function getArticles () {
-        return Article::all();
+        return $this::all();
     }
 
     public function getArticle($article) {
-        $articleRetrieved = Article::find($article);
+        $articleRetrieved = $this::find($article);
         $article = $articleRetrieved->category;
         return $articleRetrieved;
     }
@@ -37,5 +37,10 @@ class Article extends Model
     public function category()
     {
         return $this->belongsTo('App\Category');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany('App\Tag')->withTimestamps();
     }
 }

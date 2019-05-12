@@ -28,3 +28,9 @@ Route::get('/category/{categoryId}', 'CategoryController@show');
 Route::post('/category/create', 'CategoryController@store');
 Route::put('/category/{categoryId}', 'CategoryController@update');
 Route::delete('/category/{categoryId}', 'CategoryController@destroy');
+
+Route::get('/tag', 'TagController@index');
+Route::get('/tag/{tagId}', 'TagController@show');
+Route::post('/tag/create', 'TagController@store');
+Route::put('/tag/{tagId}', 'TagController@update');
+Route::delete('/tag/{tagId}', 'TagController@destroy');
