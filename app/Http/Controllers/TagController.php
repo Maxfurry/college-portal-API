@@ -97,7 +97,7 @@ class TagController extends Controller
     public function update(Request $request, $tagId)
     {
         $tag = new Tag();
-        $tag = $tag->uodateTag($request, $tagId);
+        $tag = $tag->updateTag($request, $tagId);
 
         $res = (object) array (
             'status' => 201,

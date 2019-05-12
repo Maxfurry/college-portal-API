@@ -26,7 +26,7 @@ class Tag extends Model
         return $tagRetrieved;
     }
 
-    public function uodateTag($request, $tagId) {
+    public function updateTag($request, $tagId) {
         $tagRetrieved = $this::find($tagId);
         $oldTag = $tagRetrieved->tag;
         $tagRetrieved->tag = $request->tag;
