@@ -21,6 +21,7 @@ class ArticleController extends Controller
         $res = (object) array (
             'status' => 200,
             'message' => 'All Articles Fetched Succesfully',
+            'success' => true,
             'data' => $articleRetrieved
         );
         return response()->json($res);
@@ -50,15 +51,17 @@ class ArticleController extends Controller
             $newArticle = new Article();
             $newArticle = $newArticle->createArticle($request);
 
-            $tag = new Tag();
-            $tags = $request->tag;
-            $tagIdArray = array();
+            if ($request->input('tag')) {
+                $tag = new Tag();
+                $tags = $request->tag;
+                $tagIdArray = array();
 
-            foreach($tags as $tagName) {
-                $tag = $tag->findOrCreateTag($tagName);
-                array_push($tagIdArray, $tag->id); 
+                foreach($tags as $tagName) {
+                    $tag = $tag->findOrCreateTag($tagName);
+                    array_push($tagIdArray, $tag->id); 
+                }
+                $newArticle->tags()->attach($tagIdArray);
             }
-            $newArticle->tags()->attach($tagIdArray);
 
             \DB::commit();
 
@@ -95,6 +98,7 @@ class ArticleController extends Controller
         $res = (object) array (
             'status' => 201,
             'message' => "Article $articleRetrieved->title Fetched Succesfully",
+            'success' => true,
             'data' => $articleRetrieved
         );
         return response()->json($res);
@@ -119,10 +123,44 @@ class ArticleController extends Controller
      * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $article)
+    public function update(Request $request, $articleId)
     {
-        //
-        return "Article $article Updated Succesfully";
+        \DB::beginTransaction(); 
+        try {
+            $article = new Article();
+            $article = $article->updateArticle($request, $articleId);
+
+            if ($request->input('tag')) {
+                $tag = new Tag();
+                $tags = $request->tag;
+                $tagIdArray = array();
+
+                foreach($tags as $tagName) {
+                    $tag = $tag->findOrCreateTag($tagName);
+                    array_push($tagIdArray, $tag->id); 
+                }
+                $article->tags()->sync($tagIdArray);
+            }
+
+            \DB::commit();
+            
+            $res = (object) array (
+                'status' => 201,
+                'message' => "Article $request->title updated Succesfully",
+                'success' => true,
+                'data' => $article
+            );
+        } catch (\Exception $e) {
+
+            \DB::rollback();
+
+            $res = (object) array (
+                'status' => 500,
+                'message' => "Article $newArticle->title not updated successfully",
+                'success' => false
+            );
+        }
+        return response()->json($res);
     }
 
     /**
@@ -131,9 +169,39 @@ class ArticleController extends Controller
      * @param  \App\Article  $article
      * @return \Illuminate\Http\Response
      */
-    public function destroy($article)
+    public function destroy($articleId)
     {
-        //
-        return "Article $article Deleted Succesfully";
+        \DB::beginTransaction(); 
+        try {
+            $article = new Article();
+            $article = $article->getArticle($articleId);
+            $tagIdArray = array();
+
+            foreach ($article->tags as $role) {
+                array_push($tagIdArray, $role->pivot->tag_id); 
+            }
+            
+            $article->tags()->detach($tagIdArray);
+            $article = $article->deleteArticle($articleId);
+
+            \DB::commit();
+
+            $res = (object) array (
+                'status' => 201,
+                'message' => "Article $article->title deleted Succesfully",
+                'success' => true
+            );
+        } catch (\Exception $e) {
+
+            \DB::rollback();
+
+            $res = (object) array (
+                'status' => 500,
+                'message' => "Article not deleted successfully",
+                'success' => false
+            );
+        }
+
+        return response()->json($res);
     }
 }

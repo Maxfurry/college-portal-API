@@ -10,15 +10,15 @@ class Category extends Model
     protected $fillable = ['category'];
 
     public function createCategory($request) {
-        return Category::create($request->all());
+        return $this::create($request->all());
     } 
 
     public function getCategories () {
-        return Category::all();
+        return $this::all();
     }
 
     public function getCategory($category) {
-        return Category::find($category);
+        return $this::find($category);
     }
 
     public function updateCategory($request, $catId) {
