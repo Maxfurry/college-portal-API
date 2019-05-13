@@ -20,7 +20,7 @@ class CreateArticlesTable extends Migration
             $table->text('content');
             $table->unsignedInteger('category_id')->default(1);
             $table->foreign('category_id')->references('id')->on('categories');
-            $table->boolean('status')->default(false);
+            $table->boolean('published')->default(false);
             $table->timestamps();
         });
     }

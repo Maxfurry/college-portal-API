@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Article extends Model
 {
     protected $table = 'articles';
-    protected $fillable = ['title', 'description', 'content', 'category_id', 'status'];
+    protected $fillable = ['title', 'description', 'content', 'category_id', 'published'];
     protected $hidden = ['category_id'];
 
     public function createArticle($request) {
@@ -16,7 +16,7 @@ class Article extends Model
         // $newArticle->description = $request->input('description');
         // $newArticle->content  = $request->input('content');
         // $newArticle->category_id  = $request->input('category_id');
-        // $newArticle->status  = $request->input('status');
+        // $newArticle->published  = $request->input('published');
         // $newArticle->save();
 
         // return $newArticle;
@@ -28,9 +28,32 @@ class Article extends Model
         return $this::all();
     }
 
-    public function getArticle($article) {
-        $articleRetrieved = $this::find($article);
+    public function getArticle($articleId) {
+        $articleRetrieved = $this::find($articleId);
         $article = $articleRetrieved->category;
+        return $articleRetrieved;
+    }
+
+    public function updateArticle($request, $articleId) {
+        $articleRetrieved = $this::find($articleId);
+        
+        $request = $request->input();
+        foreach ($request as $reqKey => $val) {
+            if($reqKey != "tag") {
+                $articleRetrieved->$reqKey = $val;
+            }
+        }
+
+        $articleRetrieved->save();
+
+        $updatedArticle = $articleRetrieved;
+        return $updatedArticle;
+    }
+
+    public function deleteArticle($articleId) {
+        $articleRetrieved = $this::find($articleId);
+        $articleRetrieved->delete();
+
         return $articleRetrieved;
     }
 
